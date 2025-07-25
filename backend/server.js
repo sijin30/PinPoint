@@ -5,7 +5,9 @@ import 'dotenv/config';        // 📦 Loads environment variables from .env fil
 import cors from 'cors';       // 📦 Middleware to handle Cross-Origin Resource Sharing (CORS)
 import connectDB from './configs/db.js';
 import adminRouter from './routes/adminRoutes.js'
-import blogRouter from './routes/blogRouted.js';
+import blogRouter from './routes/blogRoutes.js';
+
+
 
 // Initialize express app:
 
@@ -40,6 +42,12 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT,()=>{
     console.log('server is running on port'+PORT)
+    
+console.log("🔑 ImageKit Keys:", process.env.IMAGEKIT_PUBLIC_KEY);
+console.log("JWT_SECRET Loaded:", process.env.JWT_SECRET);
 })
 
+
+
 export default app;
+

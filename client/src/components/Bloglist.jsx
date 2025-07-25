@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
-import { blog_data, blogCategories } from '../assets/assets';
+import { blogCategories } from '../assets/assets';
 import { motion } from "framer-motion";
-
 import Blogcard from './Blogcard';
+import { useAppContext } from '../context/AppContext';
 
 function Bloglist() {
   const [menu, setMenu] = useState('All');
+  const { input, blogs } = useAppContext();
+
+  // Safety check: Ensure blogs is always an array
+  const safeBlogs = Array.isArray(blogs) ? blogs : [];
+
+  const filteredBlogs = () => {
+    let filtered = safeBlogs;
+
+    if (input?.trim()) {
+      filtered = filtered.filter((blog) =>
+        blog?.title?.toLowerCase().includes(input.toLowerCase()) ||
+        blog?.category?.toLowerCase().includes(input.toLowerCase())
+      );
+    }
+
+    if (menu !== 'All') {
+      filtered = filtered.filter(blog => blog?.category === menu);
+    }
+
+    return filtered;
+  };
 
   return (
     <div>
       {/* Category Buttons */}
-      <div className='flex justify-center gap-4 sm:gap-8 my-10 relative'>
+      <div className='flex justify-center gap-4 sm:gap-8 my-10 relative flex-wrap'>
         {blogCategories.map((item) => (
           <div key={item} className='relative'>
             <button
@@ -30,16 +51,16 @@ function Bloglist() {
         ))}
       </div>
 
-      
+      {/* Blog Cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mx-8 sm:mx-16 xl:mx-24'>
-        {blog_data
-          .filter(blog => menu === 'All' || blog.category === menu)
-          .map((blog) => (
+        {
+          filteredBlogs().map((blog) => (
             <Blogcard key={blog._id} Blog={blog} />
-          ))}
+          ))
+        }
       </div>
     </div>
-  )
+  );
 }
 
 export default Bloglist;

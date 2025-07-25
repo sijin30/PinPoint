@@ -1,8 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { assets, blogCategories } from '../../assets/assets';
 import Quill from 'quill';
+import { useAppContext } from '../../context/AppContext';
 
 function AddBlog() {
+   
+  const {axios,toast}=useAppContext();
+  const [isAdding,setIsAdding]=useState(false)
+
+
+
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
@@ -19,9 +26,50 @@ function AddBlog() {
   };
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    console.log({ image, title, subTitle, category, isPublished });
-  };
+  e.preventDefault();
+  setIsAdding(true);
+
+  try {
+    const description = quillRef.current.root.innerHTML.trim();
+    if (!description || description === '<p><br></p>') {
+      toast.error("Blog content can't be empty.");
+      return;
+    }
+
+    const blog = {
+      title,
+      subTitle,
+      description,
+      category,
+      isPublished,
+    };
+
+    const formData = new FormData();
+    formData.append('blog', JSON.stringify(blog));
+    formData.append('image', image);
+
+    const { data } = await axios.post('/api/blog/add', formData);
+
+    if (data.success) {
+      toast.success(data.message);
+      setImage(null);
+      setTitle('');
+      setSubTitle('');
+      setCategory('Startup');
+      quillRef.current.root.innerHTML = '';
+      setIsPublished(false);
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message || "Something went wrong.");
+  } finally {
+    setIsAdding(false);
+  }
+
+  console.log({ image, title, subTitle, category, isPublished });
+};
+
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -97,8 +145,9 @@ function AddBlog() {
               />
        </div>
 
-       <button type='submit' className='mt-8 w-40 h-10 bg-blue-700 text-white rounded cursor-pointer text-sm'>
-        Add Blog
+       <button  disabled={isAdding} type='submit' className='mt-8 w-40 h-10 bg-blue-700 text-white rounded cursor-pointer text-sm'>
+        
+        {isAdding?'Adding...':'Add Blog'}
        </button>
       </div>
     </form>

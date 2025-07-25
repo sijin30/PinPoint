@@ -1,7 +1,23 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { assets } from '../assets/assets.js';
+import {useAppContext} from '../context/AppContext.jsx'
 
 function Header() {
+
+  const {setInput,input}=useAppContext();
+  const inputRef=useRef();
+
+  const onSubmitHandler =async (e)=>{
+      e.preventDefault;
+      setInput(inputRef.current.value)
+
+  }
+  const onClear=()=>{
+    setInput('');
+    inputRef.current.value='';
+  }
+
+
   return (
     <div className="mx-8 sm:mx-16 xl:mx-24 relative">
       <div className='text-center mt-10 mb-10'>
@@ -20,8 +36,9 @@ function Header() {
           At <span className='text-blue-700 font-semibold'>Pinpoint</span>, we believe in capturing every thought and idea with precision — just like pinpointing the right spot. Our platform empowers you to share your stories, insights, and knowledge effortlessly, making blogging not just easy but impactful.
         </p>
 
-        <form className='flex items-center justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 rounded-lg mt-8 p-2 bg-white shadow-md transition duration-200 hover:shadow-lg overflow-hidden'>
+        <form onSubmit={onSubmitHandler} className='flex items-center justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 rounded-lg mt-8 p-2 bg-white shadow-md transition duration-200 hover:shadow-lg overflow-hidden'>
   <input 
+   ref={inputRef}
     type='text' 
     placeholder='Search for blogs...' required
     className="outline-none w-full pl-4"></input>
@@ -31,9 +48,15 @@ function Header() {
     Search
   </button>
 </form>
-
+     
       </div>
+      <div className='text-center'>{
 
+      input && <button  onClick={onClear} className='border font-light text-xs px-1 py-3  rounded-sm
+      shadow-custom-sm cursor-pointer'>
+        Clear search
+      </button>}
+      </div>
       <img 
         src={assets.gradientBackground} 
         alt="" 
